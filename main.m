@@ -24,7 +24,7 @@ end
 %% Problem 2 testing 
 if (problem_2)
 
-tspan = [0 10];
+tspan = [0 100];
 
 aircraft_state_0 = zeros(12,3);
 aircraft_surfaces = zeros(4,3);
