@@ -3,23 +3,52 @@ clc;
 
 problem_1 = 1; % on or off 1 or 0
 problem_2 = 1; % on or off 1 or 0
-problem_3 = 1; % on or off 1 or 0
+problem_3_1 = 1; % on or off 1 or 0
+problem_3_2 = 1; % on or off 1 or 0
 
 
-%% Problem 1
+%% Problem 1 testing
 if (problem_1)
 
 
 
 end
-%% Problem 2
+%% Problem 2 testing 
 if (problem_2)
+
+tspan = 0:0.1:10;
+
+aircraft_state_0 = zeros(12,3);
+aircraft_surfaces = zeros(4,3);
+
+% in:[Xe, Ye, Ze, phi, theta, psi, Ue, Ve, We, p, q, r]
+aircraft_state_0(:,1) = [0,0,-1609.34, 0,0,0, 21,0,0, 0,0,0]';
+aircraft_surfaces(:,1) = [0,0,0,0]';
+aircraft_state_0(:,2) = [0,0,-1800, 0,0.0278,0, 20.99,0,0.5837, 0,0,0]';
+aircraft_surfaces(:,2) = [0.1079,0,0,0.3182]';
+aircraft_state_0(:,3) = [0,0,-1800, 15*pi/180,-12*pi/180,270*pi/180, 19,3,-2, 0.08,-0.2,0]';
+aircraft_surfaces(:,3) = [5,2,-13,0.3]';
+
+var = zeros(length(tspan),36); % n x 36 for 3 seperate state arrays
+for i=1:3
+    
+    num = 12*(i-1);
+
+    [time, aircraft_state] = ode45(@(time,aircraft_state) AicraftEOM(time, ...
+        aircraft_state, aircraft_surfaces(:,i), wind_inertial, aircraft_parameters), ...
+        tspan, aircraft_state_0(:,i));
+    var(:, (1+num):(12+num) ) = aircraft_state; 
+end
+
+end
+%% Problem 3.1
+if (problem_3_1)
 
 
 
 end
-%% Problem 3
-if (problem_3)
+%% Problem 3.2
+if (problem_3_2)
 
 
 
