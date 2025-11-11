@@ -1,163 +1,136 @@
 function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, col)
-%% Seperate into variables
+%% PlotAircraftSim - Plots the aircraft simulation data over time.
+%
+% Syntax: PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, col)
+%
+% Inputs:
+%   time                - A vector of time values (1D array).
+% aircraft_state = [xi, yi, zi, roll, pitch, yaw, u, v, w, p, q, r]
+%   NOTE: The function assumes the veolcity is the air relative velocity
+%   vector.
+%   control_input_array  - A matrix containing the control input data (4xN).
+%   fig                 - A vector of figure handles for plotting.
+%   col                 - A string or character vector specifying the color for the plots.
+%
+% Outputs:
+%   None. The function generates plots for the aircraft simulation data.
 
-Xe = aircraft_state_array(1,:);
-Ye = aircraft_state_array(2,:);
-Ze = aircraft_state_array(3,:);
-phi = aircraft_state_array(4,:);
-theta = aircraft_state_array(5,:);
-psi = aircraft_state_array(6,:);
-Ue = aircraft_state_array(7,:);
-Ve = aircraft_state_array(8,:);
-We = aircraft_state_array(9,:);
-p = aircraft_state_array(10,:);
-q = aircraft_state_array(11,:);
-r = aircraft_state_array(12,:);
+% INPUTS:
 
-de = control_input_array(1,:);
-da = control_input_array(2,:);
-dr = control_input_array(3,:);
-dt = control_input_array(4,:);
+    % Inertial Position
+    f = figure(fig(1));
+    f.Position = [0 400 600 500];
+    tiledlayout(3,1)
+    nexttile
+    plot(time, aircraft_state_array(1, :), col) % x pos
+    ylabel("x position (m)")
+    title("Inertial Position vs. Time")
+    
+    nexttile
+    plot(time, aircraft_state_array(2, :), col) % y pos
+    ylabel("y position (m)")
 
-%% Plot individual displacement components vs time
+    nexttile
+    plot(time, aircraft_state_array(3, :), col) % z pos
+    ylabel("z position (m)")
 
-figure(fig(1));
-subplot(3,1,1);
-plot(time, Xe, col); hold on;
-grid on;
-title('X Displacement vs Time');
-xlabel('Time (s)');
-ylabel('Displacement (m)');
-subplot(3,1,2);
-plot(time, Ye, col); hold on;
-grid on;
-title('Y Displacement vs Time');
-xlabel('Time (s)');
-ylabel('Displacement (m)');
-subplot(3,1,3);
-plot(time, Ze, col); hold on;
-grid on;
-title('Z Displacement vs Time');
-xlabel('Time (s)');
-ylabel('Displacement (m)');
-set(gca, 'ydir', 'reverse'); % flip axis so negative is up
+    xlabel("Time (s)")
 
-%% Plot Euler angles vs time
 
-figure(fig(2));
-subplot(3,1,1);
-plot(time, phi, col); hold on;
-grid on;
-title('Euler Angle Phi vs Time');
-xlabel('Time (s)');
-ylabel('Angle (rad)');
-subplot(3,1,2);
-plot(time, theta, col); hold on;
-grid on;
-title('Euler Angle theta vs Time');
-xlabel('Time (s)');
-ylabel('Angle (rad)');
-subplot(3,1,2);
-subplot(3,1,3);
-plot(time, psi, col); hold on;
-grid on;
-title('Euler Angle Psi vs Time');
-xlabel('Time (s)');
-ylabel('Angle (rad)');
-subplot(3,1,2);
+    % Euler Angles
+    f = figure(fig(2));
+    f.Position = [0 0 600 500];
+    tiledlayout(3,1)
+    nexttile
+    plot(time, aircraft_state_array(4, :), col)
+    ylabel("Roll \Phi (rad)")
+    title("Euler Angles vs. Time")
+    
+    nexttile
+    plot(time, aircraft_state_array(5, :), col)
+    ylabel("Pitch \Theta (rad)")
 
-%% Plot inertial velocity components vs time
+    nexttile
+    plot(time, aircraft_state_array(6, :), col)
+    ylabel("Yaw \Psi (rad)")
 
-figure(fig(3));
-subplot(3,1,1);
-plot(time, Ue, col); hold on;
-grid on;
-title('Inertial Velocity u_e vs Time');
-xlabel('Time (s)');
-ylabel('Velocity (m/s)');
-subplot(3,1,2);
-plot(time, Ve, col); hold on;
-grid on;
-title('Inertial Velocity v_e vs Time');
-xlabel('Time (s)');
-ylabel('Velocity (m/s)');
-subplot(3,1,3);
-plot(time, We, col); hold on;
-grid on;
-title('Inertial Velocity w_e vs Time');
-xlabel('Time (s)');
-ylabel('Velocity (m/s)');
+    xlabel("Time (s)")
 
-%% Plot angular velocity components vs time
+    % Inertial Velocity
+    f = figure(fig(3));
+    f.Position = [600 400 600 500];
+    tiledlayout(3,1)
+    nexttile
+    plot(time, aircraft_state_array(7, :), col)
+    ylabel("u (m/s)")
+    title("Inertial Velocity vs. Time")
+    
+    nexttile
+    plot(time, aircraft_state_array(8, :), col)
+    ylabel("v (m/s)")
 
-figure(fig(4));
-subplot(3,1,1);
-plot(time, p, col); hold on;
-grid on;
-title('Angular Velocity p vs Time');
-xlabel('Time (s)');
-ylabel('Angular Velocity (rad/s)');
-subplot(3,1,2);
-plot(time, q, col); hold on;
-grid on;
-title('Angular Velocity q vs Time');
-xlabel('Time (s)');
-ylabel('Angular Velocity (rad/s)');
-subplot(3,1,3);
-plot(time, r, col); hold on;
-grid on;
-title('Angular Velocity r vs Time');
-xlabel('Time (s)');
-ylabel('Angular Velocity (rad/s)');
+    nexttile
+    plot(time, aircraft_state_array(9, :), col)
+    ylabel("w (m/s)")
 
-%% Plot control forces and moments vs time
+    xlabel("Time (s)")
 
-figure(fig(5));
-subplot(2,2,1);
-plot(time, de, col); hold on;
-grid on;
-title('Control Surface \delta_e vs Time');
-xlabel('Time (s)');
-ylabel('Force (N)');
-ylim([0,1]);
-subplot(2,2,2);
-plot(time, da, col); hold on;
-grid on;
-title('Control Surface \delta_a vs Time');
-xlabel('Time (s)');
-ylabel('Moment (Nm)');
-ylim([0,1]);
-subplot(2,2,3);
-plot(time, dr, col); hold on;
-grid on;
-title('Control Surface \delta_r vs Time');
-xlabel('Time (s)');
-ylabel('Moment (Nm)');
-ylim([0,1]);
-subplot(2,2,4);
-plot(time, dt, col); hold on;
-grid on;
-title('Control Surface \delta_t vs Time');
-xlabel('Time (s)');
-ylabel('Moment (Nm)');
-ylim([0,1]);
+    % Angular Velocity
+    f = figure(fig(4));
+    f.Position = [600 0 600 500];
+    tiledlayout(3,1)
+    nexttile
+    plot(time, aircraft_state_array(10, :), col)
+    ylabel("p (rad/s)")
+    title("Angular Velocity vs. Time")
+    
+    nexttile
+    plot(time, aircraft_state_array(11, :), col)
+    ylabel("q (rad/s)")
 
-%% Plot path in 3D space 
+    nexttile
+    plot(time, aircraft_state_array(12, :), col)
+    ylabel("r (rad/s)")
 
-figure(fig(6)); hold on;
-plot3(Xe,Ye,Ze,col);
-plot3(Xe(1),Ye(1),Ze(1),'go', 'MarkerFaceColor','g', 'MarkerSize', 3 ); 
-plot3(Xe(end),Ye(end),Ze(end),'r.','MarkerSize', 10, 'LineWidth', 1.5);
-view(3);
-grid on;
-title('Path of Aircraft');
-xlabel('X Displacement (m)');
-ylabel('Y Displacement (m)');
-zlabel('Z Displacement (m)');
-legend('Path','Beginning', 'End');
-zlim([0,50]);
-set(gca, 'zdir', 'reverse'); % flip axis so negative is up
-hold off;
+    xlabel("Time (s)")
+    
+    % Control Variables
+    f = figure(fig(5));
+    f.Position = [1100 400 600 500];
+    tiledlayout(4,1)
+    nexttile
+    plot(time, control_input_array(1, :), col) % Z_c
+    ylabel("Elevator Deflection (deg)")
+    title("Control Inputs vs. Time")
 
+    nexttile
+    plot(time, control_input_array(2, :), col) % L_c
+    ylabel("Aileron Deflection (deg)")
+
+    nexttile
+    plot(time, control_input_array(3, :), col) % M_c
+    ylabel("Rudder Elevator Deflection (deg)")
+
+    nexttile
+    plot(time, control_input_array(4, :), col) % N_c
+    ylim([0 1])
+    ylabel("Throttle (unitless)")
+    xlabel("Time (s)")
+
+    
+    %% 3D Position
+    f = figure(fig(6));
+    f.Position = [1000 0 600 500];
+    plot3(aircraft_state_array(1, :), aircraft_state_array(2, :), aircraft_state_array(3, :), col)
+    title("3D Path of the Aircraft")
+    xlabel("Inertial x-axis (North)")
+    ylabel("Inertial y-axis (East)")
+    zlabel("Inertial z-axis (Down)")
+    set(gca, 'Zdir', 'reverse')
+
+    hold on
+    scatter3(aircraft_state_array(1, 1), aircraft_state_array(2, 1), aircraft_state_array(3, 1), 'MarkerEdgeColor','k', 'MarkerFaceColor', "green")
+    scatter3(aircraft_state_array(1, end), aircraft_state_array(2, end), aircraft_state_array(3, end), 'MarkerEdgeColor','k', 'MarkerFaceColor', "red")
+    
 
 end
