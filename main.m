@@ -6,6 +6,7 @@ problem_2 = 1; % on or off 1 or 0
 problem_3_1 = 1; % on or off 1 or 0
 problem_3_2 = 1; % on or off 1 or 0
 
+fig = 1;
 
 %% Problem 1 testing
 if (problem_1)
@@ -29,15 +30,15 @@ aircraft_surfaces(:,2) = [0.1079,0,0,0.3182]';
 aircraft_state_0(:,3) = [0,0,-1800, 15*pi/180,-12*pi/180,270*pi/180, 19,3,-2, 0.08,-0.2,0]';
 aircraft_surfaces(:,3) = [5,2,-13,0.3]';
 
-var = zeros(length(tspan),36); % n x 36 for 3 seperate state arrays
 for i=1:3
     
-    num = 12*(i-1);
 
     [time, aircraft_state] = ode45(@(time,aircraft_state) AicraftEOM(time, ...
         aircraft_state, aircraft_surfaces(:,i), wind_inertial, aircraft_parameters), ...
         tspan, aircraft_state_0(:,i));
-    var(:, (1+num):(12+num) ) = aircraft_state; 
+
+    PlotAircraftSim(time,aircraft_state,aircraft_surfaces(:,i),fig:fig+5,'b');
+    fig = fig+6;
 end
 
 end
