@@ -1,7 +1,7 @@
 clear;
 clc;
 close all;
-%% init
+% init
 
 fig = 1;
 
@@ -13,7 +13,7 @@ ttwistor % defines aircraft_parameters
 
 %% Problem 2
 
-tspan = [0 100];
+tspan = [0 200];
 
 aircraft_state_0 = zeros(12,3);
 aircraft_surfaces = zeros(4,3);
@@ -36,14 +36,43 @@ for i=1:3
 end
 
 %% Problem 3.1
-if (problem_3_1)
+tspan = [0 3];
+aircraft_state_0 = [0,0,-1800, 0,0.0278,0, 20.99,0,0.5837, 0,0,0]';
+aircraft_surfaces = [0.1079,0,0,0.3182]';
+doublet_size = deg2rad(15);
+doublet_time = 0.25; % s
 
 
+[time, aircraft_state] = ode45(@(time,aircraft_state) AircraftEOMDoublet(time, ...
+    aircraft_state, aircraft_surfaces, doublet_size, ...
+    doublet_time, wind_inertial, aircraft_parameters), ...
+        tspan, aircraft_state_0);
 
-end
+    PlotAircraftSim(time,aircraft_state',aircraft_surfaces,fig:fig+5,'b');
+    fig = fig+6;
+
+
+% natural frequency
+
+
+% damping ratio
+
+
 %% Problem 3.2
-if (problem_3_2)
 
 
 
-end
+tspan = [0 100];
+aircraft_state_0 = [0,0,-1800, 0,0.0278,0, 20.99,0,0.5837, 0,0,0]';
+aircraft_surfaces = [0.1079,0,0,0.3182]';
+doublet_size = deg2rad(15);
+doublet_time = 0.25; % s
+
+
+[time, aircraft_state] = ode45(@(time,aircraft_state) AircraftEOMDoublet(time, ...
+    aircraft_state, aircraft_surfaces, doublet_size, ...
+    doublet_time, wind_inertial, aircraft_parameters), ...
+        tspan, aircraft_state_0);
+
+    PlotAircraftSim(time,aircraft_state',aircraft_surfaces,fig:fig+5,'m');
+    fig = fig+6;

@@ -7,7 +7,6 @@ state vector
 
 %}
 
-% Define symbolic variables for orientation
 
 zE = aircraft_state(3);
 

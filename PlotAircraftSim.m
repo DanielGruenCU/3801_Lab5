@@ -131,6 +131,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     ylabel("Inertial y-axis (East)")
     zlabel("Inertial z-axis (Down)")
     set(gca, 'Zdir', 'reverse')
+    zlim([-1900 -1000])
 
     hold on
     scatter3(aircraft_state_array(1, 1), aircraft_state_array(2, 1), aircraft_state_array(3, 1), 'MarkerEdgeColor','k', 'MarkerFaceColor', "green")
