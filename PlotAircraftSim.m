@@ -103,16 +103,16 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     f.Position = [1100 400 600 500];
     tiledlayout(4,1)
     nexttile
-    plot(time, control_input_array(1, :), col) % Z_c
+    plot(time, rad2deg(control_input_array(1, :)), col) 
     ylabel("Elevator Deflection (deg)")
     title("Control Inputs vs. Time")
 
     nexttile
-    plot(time, control_input_array(2, :), col) % L_c
+    plot(time, rad2deg(control_input_array(2, :)), col) 
     ylabel("Aileron Deflection (deg)")
 
     nexttile
-    plot(time, control_input_array(3, :), col) % M_c
+    plot(time, rad2deg(control_input_array(3, :)), col)
     ylabel("Rudder Elevator Deflection (deg)")
 
     nexttile
