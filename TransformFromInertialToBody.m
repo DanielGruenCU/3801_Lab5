@@ -1,4 +1,19 @@
 function wind_body = TransformFromInertialToBody(wind_inertial, euler_angles)
+%% TransformFromInertialToBody
+% Converts a vector expressed in the inertial (E) frame into the
+% aircraft body frame (B) using a 3–2–1 (yaw–pitch–roll) Euler
+% angle rotation sequence.
+%
+% INPUTS:
+%   wind_inertial - 3×1 vector expressed in inertial frame [m/s]
+%   euler_angles  - [phi; theta; psi] body Euler angles [rad]
+%                     phi   = roll
+%                     theta = pitch
+%                     psi   = yaw
+%
+% OUTPUT:
+%   wind_body     - 3×1 vector expressed in body frame [m/s]
+
 
 % input angles
 phi = euler_angles(1);
