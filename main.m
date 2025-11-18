@@ -137,4 +137,7 @@ char_poly = charpoly(A_sp)
 
 w_n = sqrt(char_poly(3))
 
-damping = char_poly(2)/(2*w_n)
+damping = char_poly(2)/(2*w_n)damping = char_poly(2)/(2*w_n)
+
+
+

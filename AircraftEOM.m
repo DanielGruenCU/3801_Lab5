@@ -5,6 +5,24 @@ surfaces. The inputs are time, the 12 x 1 aircraft state vector, the 4 x 1 contr
 wind velocity in inertial coordinates, and the aircraft parameter structure. The output is the derivative of the
 state vector
 
+Inputs:
+    time - n x 1 vector of time intervals
+
+    aircraft_state - 12 x 1 vector of current state of aircraft in form of 
+    [Xe, Ye, Ze, phi, theta, psi, Ue, Ve, We, p, q, r]'
+
+    aircraft_surfaces - 4 x 1 vector of current control components
+
+    wind_inertial - 3 x 1 vector of inertial wind velocity in inertial
+    coordinates
+
+    aircrafrt_parameters - a struct containing relavent physical aircraft 
+    data
+
+Outputs:
+    xdot - 12 x 1 vector containing the state derivatives to feed back to
+    ode45
+
 %}
 
 

@@ -5,19 +5,20 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
 %
 % Inputs:
 %   time                - A vector of time values (1D array).
-% aircraft_state = [xi, yi, zi, roll, pitch, yaw, u, v, w, p, q, r]
-%   NOTE: The function assumes the veolcity is the air relative velocity
-%   vector.
+%   aircraft_state = [xi, yi, zi, roll, pitch, yaw, u, v, w, p, q, r]
+%   NOTE: The function assumes the veolcity is the air relative velocity vector.
 %   control_input_array  - A matrix containing the control input data (4xN).
-%   fig                 - A vector of figure handles for plotting.
-%   col                 - A string or character vector specifying the color for the plots.
+%   fig                  - A vector of figure handles for plotting.
+%   col                  - A string or character vector specifying the color for the plots.
 %
-% Outputs:
-%   None. The function generates plots for the aircraft simulation data.
+% Outputs
+%   This function produces 6 figures for visualizing the simulation results.
+% inertial position v time, euler angles v time, inertial velocity v time, angular velocity v time,
+control variables v time, 3D position in inertial frame
 
 % INPUTS:
 
-    % Inertial Position
+%% Inertial position vs time
     f = figure(fig(1));
     f.Position = [0 400 600 500];
     tiledlayout(3,1)
@@ -40,7 +41,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     xlabel("Time (s)")
 
 
-    % Euler Angles
+%% Euler angles vs time
     f = figure(fig(2));
     f.Position = [0 0 600 500];
     tiledlayout(3,1)
@@ -59,7 +60,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
 
     xlabel("Time (s)")
 
-    % Inertial Velocity
+%% Inertial Velocity vs Time
     f = figure(fig(3));
     f.Position = [600 400 600 500];
     tiledlayout(3,1)
@@ -79,7 +80,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
 
     xlabel("Time (s)")
 
-    % Angular Velocity
+%% Angular Velocity vs Time
     f = figure(fig(4));
     f.Position = [600 0 600 500];
     tiledlayout(3,1)
@@ -98,7 +99,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
 
     xlabel("Time (s)")
     
-    % Control Variables
+%% Control Variables vs Time
     f = figure(fig(5));
     f.Position = [1100 400 600 500];
     tiledlayout(4,1)
@@ -122,7 +123,7 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     xlabel("Time (s)")
 
     
-    %% 3D Position
+    %% 3D Position in inertial frame
     f = figure(fig(6));
     f.Position = [1000 0 600 500];
     plot3(aircraft_state_array(1, :), aircraft_state_array(2, :), aircraft_state_array(3, :), col)
