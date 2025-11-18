@@ -1,0 +1,213 @@
+function xdot = AircraftEOM(time, aircraft_state, aircraft_surfaces, ...
+    wind_inertial, aircraft_parameters)
+%unpack
+%states
+
+x = aircraft_state(1);
+y = aircraft_state(2);
+z = aircraft_state(3);
+roll_a = aircraft_state(4);
+pitch_a = aircraft_state(5);
+yaw_a = aircraft_state(6);
+u = aircraft_state(7);
+v = aircraft_state(8);
+w = aircraft_state(9);
+p = aircraft_state(10);
+q = aircraft_state(11);
+r = aircraft_state(12);
+
+sigma_e= aircraft_surfaces(1);
+sigma_a= aircraft_surfaces(2);
+sigma_r= aircraft_surfaces(3);
+sigma_t= aircraft_surfaces(4);
+
+wx= wind_inertial(1);
+wy= wind_inertial(2);
+wz= wind_inertial(3);
+
+% Short alias
+ap = aircraft_parameters;
+
+% Inertias
+Ix  = aircraft_parameters.Ix;
+Iy  = aircraft_parameters.Iy;
+Iz  = aircraft_parameters.Iz;
+Ixz = aircraft_parameters.Ixz;
+
+%  Drag / aero model constants
+CDmin = aircraft_parameters.CDmin;
+CLmin = aircraft_parameters.CLmin;
+K     = aircraft_parameters.K;
+e     = aircraft_parameters.e;
+CD0   = aircraft_parameters.CD0;
+K1    = aircraft_parameters.K1;
+CDpa  = aircraft_parameters.CDpa;
+
+%  Propulsion
+Sprop  = aircraft_parameters.Sprop;
+Cprop  = aircraft_parameters.Cprop;
+kmotor = aircraft_parameters.kmotor;
+
+% Zero-AoA base coeffs
+CL0 = aircraft_parameters.CL0;
+Cm0 = aircraft_parameters.Cm0;
+CY0 = aircraft_parameters.CY0;
+Cl0 = aircraft_parameters.Cl0;
+Cn0 = aircraft_parameters.Cn0;
+
+% Longitudinal stability derivatives
+CLalpha     = aircraft_parameters.CLalpha;
+Cmalpha     = aircraft_parameters.Cmalpha;
+CLq         = aircraft_parameters.CLq;
+Cmq         = aircraft_parameters.Cmq;
+CLalphadot  = aircraft_parameters.CLalphadot;
+Cmalphadot  = aircraft_parameters.Cmalphadot;
+
+%  Lateral-directional stability derivatives
+CYbeta = aircraft_parameters.CYbeta;
+Clbeta = aircraft_parameters.Clbeta;
+Cnbeta = aircraft_parameters.Cnbeta;
+CYp    = aircraft_parameters.CYp;
+Clp    = aircraft_parameters.Clp;
+Cnp    = aircraft_parameters.Cnp;
+Clr    = aircraft_parameters.Clr;
+Cnr    = aircraft_parameters.Cnr;
+CYr    = aircraft_parameters.CYr;
+
+% Control derivatives
+CLde = aircraft_parameters.CLde;   Cmde = aircraft_parameters.Cmde;
+CYda = aircraft_parameters.CYda;   Clda = aircraft_parameters.Clda;   Cnda = aircraft_parameters.Cnda;
+CYdr = aircraft_parameters.CYdr;   Cldr = aircraft_parameters.Cldr;   Cndr = aircraft_parameters.Cndr;
+
+%% equations of motion
+
+%Roations matrix
+cphi = cos(roll_a);   sphi = sin(roll_a);
+cth  = cos(pitch_a); sth  = sin(pitch_a);
+cpsi = cos(yaw_a);   spsi = sin(yaw_a);
+R = [cth*cpsi, sphi*sth*cpsi - cphi*spsi , cphi*sth*cpsi + sphi*spsi; ...
+    cth*spsi, sphi*sth*spsi + cphi*cpsi , cphi*sth*spsi - sphi*cpsi;
+    -sth, sphi*cth,cphi*cth];
+v_b = [u;v;w];
+P_dot = R*v_b; 
+%P_dot is xdote, ydote, zdote
+
+%Euler angles
+Euler = [1, sphi*tan(pitch_a), cphi*tan(pitch_a); ... 
+    0,cphi,-sphi;...
+    0, sphi*(1/(cth)), cphi*(1/(cth))];
+angle_rates = [p;q;r];
+Euler_dot = Euler*angle_rates; 
+%euler dots are phidot thetadot yawdat
+
+
+[aero_forces, aero_moments] = AeroForcesAndMoments(aircraft_state, aircraft_surfaces, wind_inertial, density, aircraft_parameters);
+
+X= aero_forces(1);
+Y= aero_forces(2);
+Z= aero_forces(3);
+
+
+%Dynamic Velocity
+part_1 = [r*v - q*w; p*w - r*u; q*u - p*v];
+part_2 = [-sth; cth*sphi; cth*cphi;];
+part_3 = [X;Y;Z];
+V_a = sqrt(u^2 + v^2 + w^2); 
+
+V_dot = part_1 + g*part_2 + (1/m)*part_3 + (1/m)*part_4;
+
+%Dynamic Rates
+
+gamma= Ix*Iz-Ixz^2;
+gamma_1= (Ixz(Ix-Iy+Iz))/gamma;
+gamma_2= (Iz*(Iz - Iy) + Ixz^2)/gamma;
+gamma_3 = Iz/gamma;
+gamma_4 = Ixz/gamma;
+gamma_5 = (Iz - Ix)/Iy;
+gamma_6 = Ixz/Iy;
+gamma_7 = (Ix*(Ix - Iy) + Ixz^2)/gamma;
+gamma_8 = Ix/gamma;                               
+
+pdot = gamma_1*q*r - gamma_2*q*r + (gamma_3*L + gamma_4*N);
+qdot = gamma_5*p*r - gamma_6*(p^2 - r^2) + (1/Iy)*M;
+rdot = gamma_7*p*q - gamma_1*q*r + (gamma_4*L + gamma_8*N);
+var_dot = [pdot; qdot; rdot];
+
+xdot =  
+
+
+    %% aero forces and moments function
+    function [aero_forces, aero_moments] = AeroForcesAndMoments(aircraft_state, aircraft_surfaces, wind_inertial, density, aircraft_parameters)
+    %
+    % 
+    % aircraft_state = [xi, yi, zi, roll, pitch, yaw, u, v, w, p, q, r]
+    %   NOTE: The function assumes the veolcity is the air relative velocity
+    %   vector. When used with simulink the wrapper function makes the
+    %   conversion.
+    %
+    % aircraft_surfaces = [de da dr dt];
+    %
+    % Lift and Drag are calculated in Wind Frame then rotated to body frame
+    % Thrust is given in Body Frame
+    % Sideforce calculated in Body Frame
+    
+    
+    %%% redefine states and inputs for ease of use
+    ap = aircraft_parameters;
+    
+    wind_body = TransformFromInertialToBody(wind_inertial, aircraft_state(4:6,1));
+    air_rel_vel_body = aircraft_state(7:9,1) - wind_body;
+    
+    [wind_angles] = WindAnglesFromVelocityBody(air_rel_vel_body);
+    V = wind_angles(1,1);
+    beta = wind_angles(2,1);
+    alpha = wind_angles(3,1);
+    
+    p = aircraft_state(10,1);
+    q = aircraft_state(11,1);
+    r = aircraft_state(12,1);
+    
+    de = aircraft_surfaces(1,1);
+    da = aircraft_surfaces(2,1);
+    dr = aircraft_surfaces(3,1);
+    dt = aircraft_surfaces(4,1);
+    
+    alpha_dot = 0;
+    
+    %Q = ap.qbar;
+    Q = 0.5*density*V*V;
+    
+    sa = sin(alpha);
+    ca = cos(alpha);
+    
+    %%% determine aero force coefficients
+    CL = ap.CL0 + ap.CLalpha*alpha + ap.CLq*q*ap.c/(2*V) + ap.CLde*de;
+    %CD = ap.CD0 + ap.CDalpha*alpha + ap.CDq*q*ap.c/(2*V) + ap.CDde*de;
+    CD = ap.CDpa + ap.K*CL*CL;
+    
+    CX = -CD*ca + CL*sa;
+    CZ = -CD*sa - CL*ca;
+    
+    CY = ap.CY0 + ap.CYbeta*beta + ap.CYp*p*ap.b/(2*V) + ap.CYr*r*ap.b/(2*V) + ap.CYda*da + ap.CYdr*dr;
+    
+    %%Thrust = .5*density*ap.Sprop*ap.Cprop*((ap.kmotor*dt)^2 - V^2);
+    Thrust = density*ap.Sprop*ap.Cprop*(V + dt*(ap.kmotor - V))*dt*(ap.kmotor-V); %%Changed 5/2/15;New model as described in http://uavbook.byu.edu/lib/exe/fetch.php?media=shared:propeller_model.pdf
+    
+    
+    %%% determine aero forces from coeffficients 
+    X = Q*ap.S*CX + Thrust;
+    Y = Q*ap.S*CY;
+    Z = Q*ap.S*CZ;
+    
+    aero_forces = [X;Y;Z];
+    
+    %%% determine aero moment coefficients
+    Cl = ap.b*[ap.Cl0 + ap.Clbeta*beta + ap.Clp*p*ap.b/(2*V) + ap.Clr*r*ap.b/(2*V) + ap.Clda*da + ap.Cldr*dr];
+    Cm = ap.c*[ap.Cm0 + ap.Cmalpha*alpha + ap.Cmq*q*ap.c/(2*V) + ap.Cmde*de];
+    Cn = ap.b*[ap.Cn0 + ap.Cnbeta*beta + ap.Cnp*p*ap.b/(2*V) + ap.Cnr*r*ap.b/(2*V) + ap.Cnda*da + ap.Cndr*dr];
+    
+    %%% determine aero moments from coeffficients
+    aero_moments = Q*ap.S*[Cl; Cm; Cn];%[l;m;n];
+
+    end
+end
