@@ -39,6 +39,9 @@ end
 tspan = [0 3];
 aircraft_state_0 = [0,0,-1800, 0,0.0278,0, 20.99,0,0.5837, 0,0,0]';
 aircraft_surfaces = [0.1079,0,0,0.3182]';
+
+
+u_0 = aircraft_state_0(7);
 doublet_size = deg2rad(15);
 doublet_time = 0.25; % s
 
@@ -67,15 +70,31 @@ de = aircraft_surfaces(1);
     fig = fig+6;
 
 
-% natural frequency
+
+%% calculating A matrix for short period approx
+C_z_alpha = -aircraft_parameters.CD0 - aircraft_parameters.CLalpha;
+rho = atmoscoesa(-mean(aircraft_state(3,:)));
+Z_w = 0.5*rho*u_0*aircraft_parameters.S*C_z_alpha;
+M_w = 0.5*rho*u_0*aircraft_parameters.S*aircraft_parameters.c*aircraft_parameters.Cmalpha;
+M_wdot = 0.25*rho*aircraft_parameters.c^2 * aircraft_parameters.S * aircraft_parameters.Cmalphadot;
+M_q = 0.25*rho*u_0*aircraft_parameters.c^2 * aircraft_parameters.S * aircraft_parameters.Cmq;
+
+m = aircraft_parameters.m;
+g = aircraft_parameters.g;
+I_y = aircraft_parameters.Iy;
 
 
-% damping ratio
+A_sp = [Z_w/m, u_0;   (1/I_y)*(M_w + (M_wdot*Z_w)/m),  (1/I_y)*(M_q + M_wdot*u_0)]
 
+
+% Calculate the characteristic polynomial
+char_poly = charpoly(A_sp)
+
+w_n = sqrt(char_poly(3))
+
+damping = char_poly(2)/(2*w_n)
 
 %% Problem 3.2
-
-
 
 tspan = [0 100];
 aircraft_state_0 = [0,0,-1800, 0,0.0278,0, 20.99,0,0.5837, 0,0,0]';
@@ -89,5 +108,33 @@ doublet_time = 0.25; % s
     doublet_time, wind_inertial, aircraft_parameters), ...
         tspan, aircraft_state_0);
 
-    PlotAircraftSim(time,aircraft_state',aircraft_surfaces,fig:fig+5,'m');
+    new_pos_inds = find(time <= 0.25);
+    new_neg_inds = find(time >0.25 & time <=0.5);
+    new_zero_inds = find(time > 0.5);
+
+    new_surface_de(new_pos_inds) = de+doublet_size;
+
+    new_surface_de(new_neg_inds) = de-doublet_size;
+    new_surface_de(new_zero_inds) = de;
+
+    new_surfaces = repmat(aircraft_surfaces, 1, numel(time));
+    new_surfaces(1,:) = new_surface_de;
+
+    PlotAircraftSim(time,aircraft_state',new_surfaces,fig:fig+5,'m');
     fig = fig+6;
+
+
+% TODO: define X_u and Z_u and then it'll run
+X_u = ;
+
+
+Z_u = ; 
+
+A_phugoid = [X_u/m, -aircraft_parameters.g;     -Z_u/(m*u_0), 0]
+
+% Calculate the characteristic polynomial
+char_poly = charpoly(A_sp)
+
+w_n = sqrt(char_poly(3))
+
+damping = char_poly(2)/(2*w_n)
