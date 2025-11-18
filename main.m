@@ -36,14 +36,9 @@ for i=1:3
 end
 
 %% Problem 3.1
-if (problem_3_1)
 
 
 
-end
+
 %% Problem 3.2
-if (problem_3_2)
 
-
-
-end
