@@ -3,11 +3,6 @@ clc;
 close all;
 %% init
 
-problem_1 = 1; % on or off 1 or 0
-problem_2 = 1; % on or off 1 or 0
-problem_3_1 = 1; % on or off 1 or 0
-problem_3_2 = 1; % on or off 1 or 0
-
 fig = 1;
 
 
@@ -15,14 +10,8 @@ fig = 1;
 % params
 wind_inertial = [0;0;0;];
 ttwistor % defines aircraft_parameters
-%% Problem 1 testing
-if (problem_1)
 
-
-
-end
-%% Problem 2 testing 
-if (problem_2)
+%% Problem 2
 
 tspan = [0 100];
 
@@ -46,7 +35,6 @@ for i=1:3
     fig = fig+6;
 end
 
-end
 %% Problem 3.1
 if (problem_3_1)
 

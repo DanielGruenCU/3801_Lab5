@@ -30,9 +30,12 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     plot(time, aircraft_state_array(2, :), col) % y pos
     ylabel("y position (m)")
 
-    nexttile
+    ax3 = nexttile;
     plot(time, aircraft_state_array(3, :), col) % z pos
     ylabel("z position (m)")
+  
+    ax3.YDir = 'reverse'; 
+
 
     xlabel("Time (s)")
 
@@ -69,9 +72,10 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
     plot(time, aircraft_state_array(8, :), col)
     ylabel("v (m/s)")
 
-    nexttile
+    ax4 = nexttile;
     plot(time, aircraft_state_array(9, :), col)
     ylabel("w (m/s)")
+    ax4.YDir = 'reverse';
 
     xlabel("Time (s)")
 
