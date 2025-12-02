@@ -1,10 +1,10 @@
 %{
-Names: Ryan Chen, Luke Marsh, Barabara De Figueiredo Vera, Daniel
-Gruenbauer
+Names: Ryan Chen, Luke Marsh, Barabara De Figueiredo Vera, Daniel Gruenbauer
 Group: 2-11
 Lab: 5 - 3801
-}%
+%}
 
+%%
 
 clear;
 clc;
@@ -39,7 +39,7 @@ for i=1:3
         aircraft_state, aircraft_surfaces(:,i), wind_inertial, aircraft_parameters), ...
         tspan, aircraft_state_0(:,i));
 
-    PlotAircraftSim(time,aircraft_state',repmat(aircraft_surfaces(:,i), 1, numel(time)),fig:fig+5,'b');
+    PlotAircraftSim(time,aircraft_state',repmat(aircraft_surfaces(:,i), 1, numel(time)),fig:fig+5,'k');
     fig = fig+6;
 end
 
@@ -81,7 +81,8 @@ de = aircraft_surfaces(1);
 
 %% calculating A matrix for short period approx
 C_z_alpha = -aircraft_parameters.CD0 - aircraft_parameters.CLalpha;
-rho = atmoscoesa(-mean(aircraft_state(3,:)));
+%rho = atmoscoesa(-mean(aircraft_state(3,:)));
+[~,~,~,rho]=atmoscoesa(-mean(aircraft_state(3,:)));
 Z_w = 0.5*rho*u_0*aircraft_parameters.S*C_z_alpha;
 M_w = 0.5*rho*u_0*aircraft_parameters.S*aircraft_parameters.c*aircraft_parameters.Cmalpha;
 M_wdot = 0.25*rho*aircraft_parameters.c^2 * aircraft_parameters.S * aircraft_parameters.Cmalphadot;
@@ -132,20 +133,57 @@ doublet_time = 0.25; % s
     fig = fig+6;
 
 
-% TODO: define X_u and Z_u and then it'll run
-X_u = ;
+% Define:
+% X_u:partial deriv of X (aero F in the x-dir) wrt u (velocity in body x-dir) eval @trim
+% Z_u:partial deriv of Z(aero F in the z-dir) wrt u eval @trim
+% These partial derivs can be approx by the following finite difference derivs:
+% X_u=(X(uo+delta_u)-X(uo-delta_u))/(2*delta_u) & same form for Z_u, where...
+% ... delta_u: selected arbitrary small perturbation
+delta_u=0.01*max(abs(aircraft_state_0(7)),1);%(1% of trim speed)
+% ... (uo+delta_u)=state_p
+state_p=aircraft_state_0;
+state_p(7)=state_p(7)+delta_u;
+% ... (uo-delta_u)=state_m
+state_m=aircraft_state_0;
+state_m(7)=state_m(7)-delta_u;
+% ... X(uo+delta_u)=aero_forces_p(1) & Z(uo+delta_u)=aero_forces_p(3)
+[~, ~, ~, rho_trim]=atmoscoesa(-aircraft_state_0(3));%density @trim
+[aero_forces_p, ~] = AeroForcesAndMoments(state_p, aircraft_surfaces, ...
+    wind_inertial, rho_trim, aircraft_parameters);
+% ... X(uo-delta_u)=aero_forces_m(1) & Z(uo-delta_u)=aero_forces_m(3) 
+[aero_forces_m, ~] = AeroForcesAndMoments(state_m, aircraft_surfaces, ...
+    wind_inertial, rho_trim, aircraft_parameters);
+%Then:
+X_u=(aero_forces_p(1)-aero_forces_m(1))/(2*delta_u);%dX/du (approx)
+Z_u=(aero_forces_p(3)-aero_forces_m(3))/(2*delta_u);%dZ/du (approx) 
 
-
-Z_u = ; 
 
 A_phugoid = [X_u/m, -aircraft_parameters.g;     -Z_u/(m*u_0), 0]
 
 % Calculate the characteristic polynomial
-char_poly = charpoly(A_sp)
+
+% char_poly = charpoly(A_sp)
+char_poly = charpoly(A_phugoid)
 
 w_n = sqrt(char_poly(3))
 
 damping = char_poly(2)/(2*w_n)
+
+
+
+
+%%
+% <include>PlotAircraftSim.m</include>
+%%
+% <include>AeroForcesAndMoments.m</include>
+%%
+% <include>AircraftEOM.m</include>
+%%
+% <include>AircraftEOMDoublet.m</include>
+%%
+% <include>TransformFromInertialToBody.m</include>
+%%
+% <include>ttwistor.m</include>
 
 
 
