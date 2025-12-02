@@ -1,3 +1,11 @@
+%{
+Names: Ryan Chen, Luke Marsh, Barabara De Figueiredo Vera, Daniel
+Gruenbauer
+Group: 2-11
+Lab: 5 - 3801
+}%
+
+
 clear;
 clc;
 close all;

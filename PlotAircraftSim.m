@@ -13,8 +13,8 @@ function PlotAircraftSim(time, aircraft_state_array, control_input_array, fig, c
 %
 % Outputs
 %   This function produces 6 figures for visualizing the simulation results.
-% inertial position v time, euler angles v time, inertial velocity v time, angular velocity v time,
-control variables v time, 3D position in inertial frame
+%   inertial position v time, euler angles v time, inertial velocity v time, angular velocity v time,
+%   control variables v time, 3D position in inertial frame
 
 % INPUTS:
 

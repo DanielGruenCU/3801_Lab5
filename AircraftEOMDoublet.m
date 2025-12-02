@@ -6,6 +6,28 @@ surfaces. The inputs are time, the 12 x 1 aircraft state vector, the 4 x 1 contr
 wind velocity in inertial coordinates, and the aircraft parameter structure. The output is the derivative of the
 state vector
 
+Inputs:
+  time                - A vector of time values (1D array).
+  aircraft_state = [xi, yi, zi, roll, pitch, yaw, u, v, w, p, q, r]
+  NOTE: The function assumes the veolcity is the air relative velocity vector.
+  
+    aircraft_surfaces - 4 x 1 vector of current control components
+
+    wind_inertial - 3 x 1 vector of inertial wind velocity in inertial
+    coordinates
+
+    aircrafrt_parameters - a struct containing relavent physical aircraft 
+    data
+    
+    doublet_time - time of doublet maneuver
+
+    doublet size - angle deflection of doublet maneuver
+
+Outputs:
+    xdot - 12 x 1 vector containing the state derivatives to feed back to
+    ode45
+
+
 %}
 
 
