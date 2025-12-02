@@ -4,7 +4,7 @@ function xdot = AircraftEOMDoublet(time, aircraft_state, aircraft_surfaces, doub
 This function calculates the equations of motion for the fixed-wing aircraft with constant control
 surfaces. The inputs are time, the 12 x 1 aircraft state vector, the 4 x 1 control surface vector, the 3 x 1 inertial
 wind velocity in inertial coordinates, and the aircraft parameter structure. The output is the derivative of the
-state vector
+state vector.
 
 %}
 
